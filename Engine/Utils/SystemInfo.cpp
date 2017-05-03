@@ -1,7 +1,7 @@
 #include "StringUtils.h"
 #include "CPU/Processor.h"
 #include "SystemInfo.h"
-#include "Logging.h"
+#include "Logger.h"
 #include "Console.h"
 #include "../Data/Vector2.h"
 
@@ -9,18 +9,44 @@
 #define WIN32_EXTRA_LEAN
 #include <windows.h>
 #include <versionhelpers.h>
+#include "../Core/Lua.h"
 
 namespace Engine
 {
-	Processor SystemInfo::_processor = Processor();
+	SystemInfo* SystemInfo::_pInstance = nullptr;
 
+	SystemInfo* SystemInfo::Instance()
+	{
+		if (_pInstance == nullptr)
+		{
+			_pInstance = new SystemInfo();
+		}
+
+		return _pInstance;
+	}
+
+	SystemInfo::SystemInfo()
+	{
+	}
+
+	SystemInfo::~SystemInfo()
+	{
+		if (_pInstance != nullptr)
+		{
+			delete _pInstance;
+			_pInstance = nullptr;
+		}
+	}
+	
 	void SystemInfo::PrintSystemInfo()
 	{
+		std::lock_guard<std::mutex> lock(_mutex);
+
 		// Ignore logging this to file if GPU info is not available (yet?).
 		bool ignored = false;
 		/*if (Renderer::GetRenderer() == nullptr)
 		{
-			Logging::EnableFileLogging(false);
+			Logger::Instance()->EnableFileLogging(false);
 			ignored = true;
 		}*/
 
@@ -28,42 +54,37 @@ namespace Engine
 		Console::ConsoleColour textColour = Console::GetTextColour();
 		Console::SetColour(Console::ConsoleColour::Cyan);
 		Vector2 cursorPos = Console::GetCursorPos();
-		Console::SetCursorPos(0, 2);
+		Console::SetCursorPos(0, int(cursorPos.Y));
 #endif
 
-		Logging::Log("----------------------");
-		Logging::Log("SYSTEM INFO");
+		Logger::Instance()->Log("----------------------");
+		Logger::Instance()->Log("SYSTEM INFO");
 
 		// OS
-		Logging::Log(GetOSInfo());
+		Logger::Instance()->Log(GetOSInfo());
 
 		// CPU
-		Logging::Log(GetCPUInfo());
+		Logger::Instance()->Log(GetCPUInfo());
 
 		// GPU
-		Logging::Log(GetGPUInfo());
+		Logger::Instance()->Log(GetGPUInfo());
 
 		// Display
-		Logging::Log(GetDisplayInfo());
+		Logger::Instance()->Log(GetDisplayInfo());
 
 		// Memory
-		Logging::Log(GetMemInfo());
+		Logger::Instance()->Log(GetMemInfo());
 
-		Logging::Log("----------------------");
+		Logger::Instance()->Log("----------------------");
 
 #ifdef _DEBUG
 		Console::SetColour(textColour);
-
-		if (cursorPos.Y != 2)
-		{
-			Console::SetCursorPos(int(cursorPos.X), int(cursorPos.Y));
-		}
 #endif
 
 		// Make sure logging is re-enabled if it was hidden.
 		if (ignored)
 		{
-			Logging::EnableFileLogging(true);
+			Logger::Instance()->EnableFileLogging(true);
 		}
 	}
 

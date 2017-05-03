@@ -2,7 +2,7 @@
 
 #include <comdef.h>
 #include "../Core/Core.h"
-#include "Logging.h"
+#include "Logger.h"
 
 namespace Engine
 {
@@ -13,7 +13,7 @@ namespace Engine
 			_com_error err(task);
 			std::wstring wide = std::wstring(err.ErrorMessage());
 			std::string errorString(wide.begin(), wide.end());
-			Logging::Log(errorString);
+			Logger::Instance()->Log(errorString);
 
 			return true;
 		}
@@ -23,14 +23,14 @@ namespace Engine
 
 	static std::string GetRelativePath(const char* relativePath)
 	{
-		std::string appDirectory = Core::GetApplicationDirectory();
+		std::string appDirectory = Core::Instance()->GetApplicationDirectory();
 		appDirectory.append(relativePath);
 		return appDirectory;
 	}
 
 	static std::wstring GetRelativePath(const wchar_t* relativePath)
 	{
-		std::string appDirectory = Core::GetApplicationDirectory();
+		std::string appDirectory = Core::Instance()->GetApplicationDirectory();
 		std::wstring wide = std::wstring(appDirectory.begin(), appDirectory.end());
 		wide.append(relativePath);
 		return wide;

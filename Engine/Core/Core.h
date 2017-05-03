@@ -1,43 +1,41 @@
 #pragma once
 
-#include <functional>
 #include "Common.h"
-
-#define WIN32_LEAN_AND_MEAN
-#define WIN32_EXTRA_LEAN
-#include <windows.h>
+#include "../Data/String.h"
+#include "../Input/Event.h"
 
 namespace Engine
 {
-	struct ENGINE_LINK_DESC
-	{
-		std::function<void()> CreateMethod;
-		std::function<void()> UpdateLoop;
-		std::function<void()> DrawLoop;
-		std::function<void()> DestroyMethod;
-	};
+	class Lua;
+	class Time;
+	class Input;
 
 	class Core
 	{
 	public:
-		static ENGINE_API bool Update();
-		static ENGINE_API std::string GetApplicationDirectory();
-		static ENGINE_API bool Running();
-		static ENGINE_API void Exit();
-		static ENGINE_API void Destroy();
-		static ENGINE_API void Initialise(int width, int height, bool windowed, ENGINE_LINK_DESC engineLink, HWND windowHandle = nullptr);
-		static ENGINE_API void SetMaxFPS(int max);
-		static ENGINE_API int GetMaxFPS();
+		ENGINE_API Core();
+		ENGINE_API ~Core();
+		ENGINE_API bool Update();
+		ENGINE_API bool Running() const;
+		ENGINE_API void Shutdown();
+		ENGINE_API void Initialise(int width, int height, bool windowed);
+		ENGINE_API void SetMaxFPS(int max);
+		ENGINE_API int GetMaxFPS() const;
+		static ENGINE_API String GetApplicationDirectory();
+		static ENGINE_API Core* Instance();
+
+		Event OnUpdate;
+		Event OnRender;
+		Event OnShutdown;
 
 	private:
-		static void Render();
+		static Core* _pInstance;
+		static String _appDirectory;
 
-		static bool _renderThreadAssigned;
-		static bool _running;
-		static int _maxFps;
-		static std::string _appDirectory;
-
-		static std::function<void()> _updateLoop;
-		static std::function<void()> _destroyMethod;
+		Lua* _pLua;
+		Time* _pTime;
+		Input* _pInput;
+		bool _running;
+		int _maxFps;
 	};
 }

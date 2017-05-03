@@ -1,51 +1,72 @@
-#include <thread>
 #include "Core.h"
 #include "Time.h"
 #include "../Input/Input.h"
+#include "Lua.h"
+
+#define WIN32_LEAN_AND_MEAN
+#define WIN32_EXTRA_LEAN
+#include <windows.h>
+#include "../Utils/Logger.h"
 
 namespace Engine
 {
-	const float TimeEpsilon = 0.0001f;
+	Core* Core::_pInstance = nullptr;
+	String Core::_appDirectory;
 
-	std::string Core::_appDirectory = std::string();
-	bool Core::_running = true;
-	bool Core::_renderThreadAssigned = false;
-	int Core::_maxFps;
-	std::function<void()> Core::_updateLoop;
-	std::function<void()> Core::_destroyMethod;
-	std::thread _renderThread = std::thread();
+	Core::Core()
+		: _running(true)
+		, _maxFps(0)
+	{
+		_pInstance = this;
+
+		_pLua = Lua::Instance();
+		_pTime = Time::Instance();
+		_pInput = Input::Instance();
+
+		_pLua->Load(GetApplicationDirectory() + "game.lua");
+
+		_pInput->RegisterKey(VK_ESCAPE, KeyDown, [=]
+		{
+			Shutdown();
+		}, "__exit");
+	}
+
+	Core::~Core()
+	{
+		if (_running)
+		{
+			Shutdown();
+		}
+	}
 
 	bool Core::Update()
 	{
-		Time::Update();
-		Input::Update();
-
-		// Call the main update loop.
-		_updateLoop();
-
+		OnUpdate.Call();
+		
 		if (_maxFps > 0)
 		{
-			Time::Sleep(1.0f / _maxFps - Time::DeltaTime());
+			_pTime->Sleep(1.0f / _maxFps - _pTime->DeltaTime());
 		}
 
 		return EXIT_SUCCESS;
 	}
 
-	void Core::Render()
+	void Core::Initialise(int width, int height, bool windowed)
 	{
+		Logger::Instance()->Log("Width: {0}", width);
+		Logger::Instance()->Log("Height: {0}", height);
+		Logger::Instance()->Log("Windowed: {0}", windowed);
 	}
 
-	void Core::Initialise(int width, int height, bool windowed, ENGINE_LINK_DESC engineLink, HWND windowHandle)
+	void Core::Shutdown()
 	{
-		Time::Initialise();
+		OnShutdown.Call();
+		_running = false;
+	}
 
-		_updateLoop = engineLink.UpdateLoop;
-		_destroyMethod = engineLink.DestroyMethod;
-
-		Input::RegisterKey(VK_ESCAPE, KeyDown, []
-		{
-			Exit();
-		}, "__exit");
+	bool Core::Running() const
+	{
+		return _running;
 	}
 
 	void Core::SetMaxFPS(int max)
@@ -53,43 +74,28 @@ namespace Engine
 		_maxFps = max;
 	}
 
-	int Core::GetMaxFPS()
+	int Core::GetMaxFPS() const
 	{
 		return _maxFps;
 	}
 
-	void Core::Exit()
+	Core* Core::Instance()
 	{
-		_running = false;
+		return _pInstance;
 	}
 
-	bool Core::Running()
+	String Core::GetApplicationDirectory()
 	{
-		return _running;
-	}
-
-	void Core::Destroy()
-	{
-		Exit();
-
-		_destroyMethod();
-
-		_updateLoop = nullptr;
-		_destroyMethod = nullptr;
-	}
-
-	std::string Core::GetApplicationDirectory()
-	{
-		if (_appDirectory.empty())
+		if (_appDirectory.Length() == 0)
 		{
 			char dir[512];
 			GetModuleFileNameA(nullptr, dir, sizeof(dir));
 			_appDirectory = std::string(dir);
 
-			size_t seperatorIndex = _appDirectory.find_last_of('\\');
+			size_t seperatorIndex = _appDirectory.Str().find_last_of('\\');
 			if (seperatorIndex != -1)
 			{
-				_appDirectory = _appDirectory.substr(0, seperatorIndex + 1);
+				_appDirectory = _appDirectory.Str().substr(0, seperatorIndex + 1);
 			}
 		}
 

@@ -2,7 +2,7 @@
 
 #include "CPU/Processor.h"
 #include "../Core/Common.h"
-#include <string>
+#include <mutex>
 
 namespace Engine
 {
@@ -11,17 +11,22 @@ namespace Engine
 	class SystemInfo
 	{
 	public:
-		static ENGINE_API void PrintSystemInfo();
-		static ENGINE_API Vector2 GetNativeResolution();
-		static ENGINE_API int GetCPUCores();
+		ENGINE_API void PrintSystemInfo();
+		ENGINE_API Vector2 GetNativeResolution();
+		ENGINE_API int GetCPUCores();
+		static ENGINE_API SystemInfo* Instance();
 
 	private:
-		static std::string GetOSInfo();
-		static std::string GetCPUInfo();
-		static std::string GetGPUInfo();
-		static std::string GetMemInfo();
-		static std::string GetDisplayInfo();
-		static std::string GetFileVersion(const std::string& fileName);
-		static Processor _processor;
+		SystemInfo();
+		~SystemInfo();
+		std::string GetOSInfo();
+		std::string GetCPUInfo();
+		std::string GetGPUInfo();
+		std::string GetMemInfo();
+		std::string GetDisplayInfo();
+		std::string GetFileVersion(const std::string& fileName);
+		Processor _processor;
+		static SystemInfo* _pInstance;
+		std::mutex _mutex;
 	};
 }

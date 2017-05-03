@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Core\Common.h" />
     <ClInclude Include="Core\Core.h" />
+    <ClInclude Include="Core\Lua.h" />
     <ClInclude Include="Core\Time.h" />
     <ClInclude Include="Data\Colour.h" />
     <ClInclude Include="Data\String.h" />
@@ -29,12 +30,18 @@
     <ClInclude Include="Data\Vector4.h" />
     <ClInclude Include="External\include\CPPFormat\format.h" />
     <ClInclude Include="External\include\FreeImage\FreeImage.h" />
+    <ClInclude Include="External\include\Lua\lauxlib.h" />
+    <ClInclude Include="External\include\Lua\lua.h" />
+    <ClInclude Include="External\include\Lua\lua.hpp" />
+    <ClInclude Include="External\include\Lua\luaconf.h" />
+    <ClInclude Include="External\include\Lua\lualib.h" />
+    <ClInclude Include="External\include\Lua\sol.hpp" />
     <ClInclude Include="Input\Event.h" />
     <ClInclude Include="Input\Input.h" />
     <ClInclude Include="Utils\Console.h" />
     <ClInclude Include="Utils\CPU\Processor.h" />
     <ClInclude Include="Utils\Helpers.h" />
-    <ClInclude Include="Utils\Logging.h" />
+    <ClInclude Include="Utils\Logger.h" />
     <ClInclude Include="Utils\Math.h" />
     <ClInclude Include="Utils\StringUtils.h" />
     <ClInclude Include="Utils\SystemInfo.h" />
@@ -42,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Core.cpp" />
+    <ClCompile Include="Core\Lua.cpp" />
     <ClCompile Include="Core\Time.cpp" />
     <ClCompile Include="Data\Colour.cpp" />
     <ClCompile Include="Data\String.cpp" />
@@ -53,7 +61,7 @@
     <ClCompile Include="Input\Input.cpp" />
     <ClCompile Include="Utils\Console.cpp" />
     <ClCompile Include="Utils\CPU\Processor.cpp" />
-    <ClCompile Include="Utils\Logging.cpp" />
+    <ClCompile Include="Utils\Logger.cpp" />
     <ClCompile Include="Utils\SystemInfo.cpp" />
     <ClCompile Include="Utils\Win32Utils.cpp" />
   </ItemGroup>
@@ -123,7 +131,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)\External\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;Mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;Mincore.lib;lua53.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -137,7 +145,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)\External\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;Mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;Mincore.lib;lua53.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -155,7 +163,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(ProjectDir)\External\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;Mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;Mincore.lib;lua53.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -173,7 +181,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(ProjectDir)\External\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImage.lib;Mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeImage.lib;Mincore.lib;lua53.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

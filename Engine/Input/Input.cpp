@@ -1,19 +1,39 @@
 #include <map>
 #include <vector>
 #include "Input.h"
-#include "../Utils/Logging.h"
+#include "../Utils/Logger.h"
+#include "../Core/Core.h"
 
 namespace Engine
 {
-	std::map<int, std::vector<Input::KeyEvent>> Input::_keyEvents;
-	std::map<int, std::vector<Input::MouseEvent>> Input::_mouseEvents;
-	std::map<int, bool> Input::_activeKeys;
-	std::map<int, bool> Input::_activeMouseButtons;
-	std::map<Input::DeleteType, std::vector<std::string>> Input::_deleteQueue;
-	std::vector<Input::MMoveEvent> Input::_mouseMoveEvents;
-	bool Input::_deletionQueued = false;
-	bool Input::_keyPressed = false;
-	bool Input::_mousePressed = false;
+	Input* Input::_pInstance = nullptr;
+
+	Input::Input()
+	: _deletionQueued(false)
+	, _keyPressed(false)
+	, _mousePressed(false)
+	{
+		Core::Instance()->OnUpdate += std::bind(&Input::Update, this);
+	}
+
+	Input* Input::Instance()
+	{
+		if (_pInstance == nullptr)
+		{
+			_pInstance = new Input();
+		}
+
+		return _pInstance;
+	}
+
+	Input::~Input()
+	{
+		if (_pInstance != nullptr)
+		{
+			delete _pInstance;
+			_pInstance = nullptr;
+		}
+	}
 
 	void Input::KeyUpEvent(unsigned short keyCode)
 	{
@@ -153,7 +173,7 @@ namespace Engine
 	{
 		if (KeyEventExists(eventName))
 		{
-			Logging::LogWarning("Tried to register a key event ({0}) which already exists.", eventName);
+			Logger::Instance()->LogWarning("Tried to register a key event ({0}) which already exists.", eventName);
 			return;
 		}
 
@@ -175,7 +195,7 @@ namespace Engine
 	{
 		if (MouseEventExists(eventName))
 		{
-			Logging::LogWarning("Tried to register a mouse button event ({0}) which already exists.", eventName);
+			Logger::Instance()->LogWarning("Tried to register a mouse button event ({0}) which already exists.", eventName);
 			return;
 		}
 
@@ -197,7 +217,7 @@ namespace Engine
 	{
 		if (MouseMoveEventExists(eventName))
 		{
-			Logging::LogWarning("Tried to register a mouse move event ({0}) which already exists.", eventName);
+			Logger::Instance()->LogWarning("Tried to register a mouse move event ({0}) which already exists.", eventName);
 			return;
 		}
 
@@ -261,7 +281,7 @@ namespace Engine
 		{
 			if (*it == eventName)
 			{
-				Logging::LogWarning("Tried to unregister a key event ({0}) that has already been queued for removal.", eventName);
+				Logger::Instance()->LogWarning("Tried to unregister a key event ({0}) that has already been queued for removal.", eventName);
 				return;
 			}
 		}
@@ -276,7 +296,7 @@ namespace Engine
 		{
 			if (*it == eventName)
 			{
-				Logging::LogWarning("Tried to unregister a mouse button event ({0}) that has already been queued for removal.", eventName);
+				Logger::Instance()->LogWarning("Tried to unregister a mouse button event ({0}) that has already been queued for removal.", eventName);
 				return;
 			}
 		}
@@ -291,7 +311,7 @@ namespace Engine
 		{
 			if (*it == eventName)
 			{
-				Logging::LogWarning("Tried to unregister a mouse move event ({0}) that has already been queued for removal.", eventName);
+				Logger::Instance()->LogWarning("Tried to unregister a mouse move event ({0}) that has already been queued for removal.", eventName);
 				return;
 			}
 		}
@@ -319,7 +339,7 @@ namespace Engine
 			}
 		}
 
-		Logging::LogWarning("Could not find key event named '{0}'.", eventName);
+		Logger::Instance()->LogWarning("Could not find key event named '{0}'.", eventName);
 	}
 
 	void Input::DeleteMouseButton(std::string eventName)
@@ -341,7 +361,7 @@ namespace Engine
 			}
 		}
 
-		Logging::LogWarning("Could not find mouse button event named '{0}'.", eventName);
+		Logger::Instance()->LogWarning("Could not find mouse button event named '{0}'.", eventName);
 	}
 
 	void Input::DeleteMouseMoveEvent(std::string eventName)
@@ -355,6 +375,6 @@ namespace Engine
 			}
 		}
 
-		Logging::LogWarning("Could not find mouse move event named '{0}'.", eventName);
+		Logger::Instance()->LogWarning("Could not find mouse move event named '{0}'.", eventName);
 	}
 }

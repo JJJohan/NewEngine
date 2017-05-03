@@ -1,5 +1,5 @@
 #include <cstdlib>
-#include "../Engine/Utils/Logging.h"
+#include "../Engine/Utils/Logger.h"
 #include "../Engine/Core/Core.h"
 #include "../Engine/Core/Time.h"
 #include "../Engine/Utils/Console.h"
@@ -47,45 +47,39 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	Console::InitConsole();
 #endif
 
-	Logging::Log("Starting engine...\n");
+	Logger::Instance()->Log("Starting engine...\n");
 	
 	float timer = 0.0f;
-	Game game;
-	ENGINE_LINK_DESC engineLink =
+
+	Core core;
+	//Core::Initialise(1024, 768, true, engineLink);
+	//Core::SetMaxFPS(300);
+
+	//SystemInfo::PrintSystemInfo();
+
+	while (core.Running())
 	{
-		std::bind(&Game::Start, &game),
-		std::bind(&Game::Update, &game),
-		std::bind(&Game::Draw, &game),
-		std::bind(&Game::Destroy, &game)
-	};
-
-	Core::Initialise(1024, 768, true, engineLink);
-	Core::SetMaxFPS(300);
-
-	SystemInfo::PrintSystemInfo();
-
-	while (Core::Running())
-	{
-		if (Core::Update() != EXIT_SUCCESS)
+		if (core.Update() != EXIT_SUCCESS)
 		{
 			// Update returned false, exit.
 			break;
 		}
 
-		timer += Time::DeltaTime();
+		float dt = Time::Instance()->DeltaTime();
+		timer += dt;
 		if (timer > 0.1f)
 		{
-			String title = String::Format("Engine - CPU: {0} FPS | GPU: {1} FPS", int(1 / Time::DeltaTime()), int(1 / Time::GPUTime()));
+			String title = String::Format("Engine - CPU: {0} FPS", int(1 / dt));
 			Console::SetTitle(title);
 			timer -= 0.1f;
 		}
 	}
 
-	Logging::Log("\n\nDestroying engine...");
+	Logger::Instance()->Log("\n\nDestroying engine...");
 
-	Core::Destroy();
+	core.Shutdown();
 
-	Logging::Log("Engine destroyed");
+	Logger::Instance()->Log("Engine destroyed");
 
 	return EXIT_SUCCESS;
 }

@@ -14,43 +14,51 @@
 
 #include "../Data/String.h"
 #include <comdef.h>
+#include <mutex>
 
 namespace Engine
 {
-	class Logging
+	class Logger
 	{
 	public:
-		static ENGINE_API void Log(const String& message);
-		static ENGINE_API void LogError(const String& message);
-		static ENGINE_API void LogWarning(const String& message);
-		static void LogWin32Error();
+		ENGINE_API void Log(const std::string& message);
+		ENGINE_API void LogError(const std::string& message);
+		ENGINE_API void LogWarning(const std::string& message);
+		void LogWin32Error();
 		static String GetWin32ErrorString();
 		static String GetCOMError(const _com_error& error, const String& caller);
-		static ENGINE_API void EnableFileLogging(bool enabled);
-		static ENGINE_API void SetLogPath(const String& filePath);
+		ENGINE_API void EnableFileLogging(bool enabled);
+		ENGINE_API void SetLogPath(const std::string& filePath);
 
 		template <typename... Args>
-		static void Log(const String& string, Args ... args)
+		void Log(const String& string, Args ... args)
 		{
 			std::string text = fmt::format(string.Str(), args...);
 			Log(text);
 		}
 
 		template <typename... Args>
-		static void LogWarning(const String& string, Args ... args)
+		void LogWarning(const String& string, Args ... args)
 		{
 			std::string text = fmt::format(string.Str(), args...);
 			LogWarning(text);
 		}
 
 		template <typename... Args>
-		static void LogError(const String& string, Args ... args)
+		void LogError(const String& string, Args ... args)
 		{
 			std::string text = fmt::format(string.Str(), args...);
 			LogError(text);
 		}
 
+		static ENGINE_API Logger* Instance();
+
 	private:
+		Logger();
+		~Logger();
+
+		static Logger* _pInstance;
+
 		enum LogPriority
 		{
 			Info,
@@ -58,8 +66,9 @@ namespace Engine
 			Error
 		};
 
-		static LogPriority LogLevel;
-		static bool _logToFile;
-		static String _logFilePath;
+		LogPriority _logLevel;
+		bool _logToFile;
+		String _logFilePath;
+		std::mutex _mutex;
 	};
 }

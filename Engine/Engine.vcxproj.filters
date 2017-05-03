@@ -28,6 +28,9 @@
     <Filter Include="External\CPPFormat">
       <UniqueIdentifier>{8f93c2dc-5554-49dc-a486-f3b51e376752}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External\Lua">
+      <UniqueIdentifier>{40027058-6a34-4977-821f-b9223a78e921}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Common.h">
@@ -63,9 +66,6 @@
     <ClInclude Include="Utils\Helpers.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\Logging.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Utils\Math.h">
       <Filter>Utils</Filter>
     </ClInclude>
@@ -89,6 +89,30 @@
     </ClInclude>
     <ClInclude Include="External\include\FreeImage\FreeImage.h">
       <Filter>External\FreeImage</Filter>
+    </ClInclude>
+    <ClInclude Include="External\include\Lua\lauxlib.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="External\include\Lua\lua.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="External\include\Lua\lua.hpp">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="External\include\Lua\luaconf.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="External\include\Lua\lualib.h">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Lua.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="External\include\Lua\sol.hpp">
+      <Filter>External\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Logger.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -119,9 +143,6 @@
     <ClCompile Include="Utils\Console.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\Logging.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\SystemInfo.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
@@ -136,6 +157,12 @@
     </ClCompile>
     <ClCompile Include="External\include\CPPFormat\format.cc">
       <Filter>External\CPPFormat</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Lua.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Logger.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

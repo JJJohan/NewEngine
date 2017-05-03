@@ -23,31 +23,35 @@ namespace Engine
 	class Input
 	{
 	public:
-		static ENGINE_API void KeyUpEvent(unsigned short keyCode);
-		static ENGINE_API void KeyDownEvent(unsigned short keyCode);
+		ENGINE_API void KeyUpEvent(unsigned short keyCode);
+		ENGINE_API void KeyDownEvent(unsigned short keyCode);
 
-		static ENGINE_API void MouseButtonUpEvent(unsigned short mouseButton);
-		static ENGINE_API void MouseButtonDownEvent(unsigned short mouseButton);
-		static ENGINE_API void MouseMoveEvent(long deltaX, long deltaY);
+		ENGINE_API void MouseButtonUpEvent(unsigned short mouseButton);
+		ENGINE_API void MouseButtonDownEvent(unsigned short mouseButton);
+		ENGINE_API void MouseMoveEvent(long deltaX, long deltaY);
 
-		static ENGINE_API void RegisterKey(int keyCode, KeyState keyState, const std::function<void()>& event, std::string eventName);
-		static ENGINE_API void RegisterMouseButton(int mouseButton, MouseState mouseState, const std::function<void()>& event, std::string eventName);
-		static ENGINE_API void RegisterMouseMoveEvent(const std::function<void(long x, long y)>& event, std::string eventName);
+		ENGINE_API void RegisterKey(int keyCode, KeyState keyState, const std::function<void()>& event, std::string eventName);
+		ENGINE_API void RegisterMouseButton(int mouseButton, MouseState mouseState, const std::function<void()>& event, std::string eventName);
+		ENGINE_API void RegisterMouseMoveEvent(const std::function<void(long x, long y)>& event, std::string eventName);
 
-		static ENGINE_API void UnregisterKey(std::string eventName);
-		static ENGINE_API void UnregisterMouseButton(std::string eventName);
-		static ENGINE_API void UnregisterMouseMoveEvent(std::string eventName);
+		ENGINE_API void UnregisterKey(std::string eventName);
+		ENGINE_API void UnregisterMouseButton(std::string eventName);
+		ENGINE_API void UnregisterMouseMoveEvent(std::string eventName);
 
-		static void Update();
+		void Update();
+		static ENGINE_API Input* Instance();
 
 	private:
-		static bool KeyEventExists(std::string eventName);
-		static bool MouseEventExists(std::string eventName);
-		static bool MouseMoveEventExists(std::string eventName);
+		Input();
+		~Input();
 
-		static void DeleteKey(std::string eventName);
-		static void DeleteMouseButton(std::string eventName);
-		static void DeleteMouseMoveEvent(std::string eventName);
+		bool KeyEventExists(std::string eventName);
+		bool MouseEventExists(std::string eventName);
+		bool MouseMoveEventExists(std::string eventName);
+
+		void DeleteKey(std::string eventName);
+		void DeleteMouseButton(std::string eventName);
+		void DeleteMouseMoveEvent(std::string eventName);
 
 		struct KeyEvent
 		{
@@ -76,18 +80,18 @@ namespace Engine
 			Delete_MMove
 		};
 
+		void CallKeyEvents(int keyCode, bool keyPressed);
+		void CallMouseEvents(int mouseButton, bool buttonPressed);
+		static Input* _pInstance;
 
-		static void CallKeyEvents(int keyCode, bool keyPressed);
-		static void CallMouseEvents(int mouseButton, bool buttonPressed);
-
-		static std::map<int, std::vector<KeyEvent>> _keyEvents;
-		static std::map<int, bool> _activeKeys;
-		static std::map<int, std::vector<MouseEvent>> _mouseEvents;
-		static std::map<int, bool> _activeMouseButtons;
-		static std::vector<MMoveEvent> _mouseMoveEvents;
-		static std::map<DeleteType, std::vector<std::string>> _deleteQueue;
-		static bool _deletionQueued;
-		static bool _keyPressed;
-		static bool _mousePressed;
+		std::map<int, std::vector<KeyEvent>> _keyEvents;
+		std::map<int, bool> _activeKeys;
+		std::map<int, std::vector<MouseEvent>> _mouseEvents;
+		std::map<int, bool> _activeMouseButtons;
+		std::vector<MMoveEvent> _mouseMoveEvents;
+		std::map<DeleteType, std::vector<std::string>> _deleteQueue;
+		bool _deletionQueued;
+		bool _keyPressed;
+		bool _mousePressed;
 	};
 }

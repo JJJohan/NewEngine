@@ -1,29 +1,52 @@
 #include "Time.h"
-#include "../Utils/Logging.h"
+#include "../Core/Core.h"
 #include <thread>
+#include "../Utils/Logger.h"
 
 namespace Engine
 {
-	float Time::_deltaTime = 0.0f;
-	float Time::_runningTime = 0.0f;
-	float Time::_gpuTime = 0.0f;
-	double Time::_frequency = 0.0;
-	double Time::_cpuCounter = 0.0;
-
 	const float TimeEpsilon = 0.0f;
 
-	void Time::Initialise()
+	Time* Time::_pInstance = nullptr;
+
+	Time::Time()
+		: _deltaTime(0.0f)
+		, _runningTime(0.0f)
+		, _gpuTime(0.0f)
+		, _frequency(0.0)
+		, _cpuCounter(0.0)
 	{
 		LARGE_INTEGER li;
 		if (!QueryPerformanceFrequency(&li))
 		{
-			Logging::LogError("QueryPerformanceFrequency failed!");
+			Logger::Instance()->LogError("QueryPerformanceFrequency failed!");
 		}
 
 		_frequency = double(li.QuadPart);
 
 		QueryPerformanceCounter(&li);
 		_cpuCounter = double(li.QuadPart);
+
+		Core::Instance()->OnUpdate += std::bind(&Time::Update, this);
+	}
+
+	Time::~Time()
+	{
+		if (_pInstance != nullptr)
+		{
+			delete _pInstance;
+			_pInstance = nullptr;
+		}
+	}
+	
+	Time* Time::Instance()
+	{
+		if (_pInstance == nullptr)
+		{
+			_pInstance = new Time();
+		}
+
+		return _pInstance;
 	}
 
 	void Time::ResetCPUCounter()
@@ -33,7 +56,7 @@ namespace Engine
 		_cpuCounter = double(li.QuadPart);
 	}
 
-	float Time::DeltaTime()
+	float Time::DeltaTime() const
 	{
 		if (_deltaTime > 10.0f)
 		{
@@ -43,12 +66,12 @@ namespace Engine
 		return _deltaTime;
 	}
 
-	float Time::RunningTime()
+	float Time::RunningTime() const
 	{
 		return _runningTime;
 	}
 
-	float Time::GPUTime()
+	float Time::GPUTime() const
 	{
 		return _gpuTime;
 	}
@@ -59,7 +82,7 @@ namespace Engine
 		QueryPerformanceFrequency(&freq);
 		QueryPerformanceCounter(&begin);
 		QueryPerformanceCounter(&end);
-		__int64 waitTime = freq.QuadPart * seconds;
+		__int64 waitTime = __int64(freq.QuadPart * seconds);
 		while (end.QuadPart - begin.QuadPart < waitTime)
 		{
 			std::this_thread::sleep_for(std::chrono::microseconds(1));
@@ -73,7 +96,7 @@ namespace Engine
 		QueryPerformanceCounter(&li);
 
 		// Calculate frame time
-		_deltaTime = float(li.QuadPart - _cpuCounter) / _frequency;
+		_deltaTime = float(float(li.QuadPart - _cpuCounter) / _frequency);
 		_runningTime += _deltaTime;
 
 		ResetCPUCounter();

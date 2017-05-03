@@ -3,7 +3,7 @@
 #include <io.h>
 #include "Console.h"
 #include "../Core/Core.h"
-#include "Logging.h"
+#include "Logger.h"
 #include "../Data/Vector2.h"
 
 namespace Engine
@@ -81,7 +81,7 @@ namespace Engine
 
 	bool Console::HandlerRoutine(DWORD ctrlType)
 	{
-		Core::Exit();
+		Core::Instance()->Shutdown();
 		Sleep(5000);
 		return true;
 	}
@@ -129,7 +129,7 @@ namespace Engine
 		// Specify a handler to listen for close events
 		if (!SetConsoleCtrlHandler(PHANDLER_ROUTINE(HandlerRoutine), true))
 		{
-			Logging::LogError("Could not set console control handler.");
+			Logger::Instance()->LogError("Could not set console control handler.");
 		}
 	}
 }

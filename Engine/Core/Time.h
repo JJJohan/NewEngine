@@ -8,22 +8,25 @@ namespace Engine
 	class Time
 	{
 	public:
-		static ENGINE_API float DeltaTime();
-		static ENGINE_API float RunningTime();
-		static ENGINE_API float GPUTime();
-		static ENGINE_API void Sleep(float seconds);
+		ENGINE_API float DeltaTime() const;
+		ENGINE_API float RunningTime() const;
+		ENGINE_API float GPUTime() const;
+		ENGINE_API void Sleep(float seconds);
 
-		static void Initialise();
-		static void Update();
+		void Update();
+		static ENGINE_API Time* Instance();
 
 	private:
-		static void ResetCPUCounter();
-		static void SetGPUDelta(float delta);
+		Time();
+		~Time();
+		void ResetCPUCounter();
+		void SetGPUDelta(float delta);
 
-		static float _deltaTime;
-		static float _runningTime;
-		static float _gpuTime;
-		static double _frequency;
-		static double _cpuCounter;
+		static Time* _pInstance;
+		float _deltaTime;
+		float _runningTime;
+		float _gpuTime;
+		double _frequency;
+		double _cpuCounter;
 	};
 }

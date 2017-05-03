@@ -5,6 +5,7 @@ namespace Engine
 {
 	String::String()
 	{
+		_string = std::string();
 	}
 
 	String::String(std::stringstream stream)
@@ -71,7 +72,7 @@ namespace Engine
 
 	size_t String::Length() const
 	{
-		return _string.length();
+		return 0;
 	}
 
 	String String::Trim()
