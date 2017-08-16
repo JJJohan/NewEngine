@@ -14,9 +14,20 @@ namespace Engine
 		, _logToFile(true)
 	{
 		_logFilePath = GetRelativePath("");
+		Console::Instance()->SetColour(Console::ConsoleColour::White);
+		Core::Instance()->Register(this);
+		
+		Core::Instance()->OnShutdown += std::bind(&Logger::Shutdown);
 	}
 
-	Logger::~Logger()
+	void Logger::Register()
+	{
+		Lua::Instance()->RegisterMethod("Logger", "Log", SmartBind<Logger, void, const std::string&>(*this, &Logger::Log));
+		Lua::Instance()->RegisterMethod("Logger", "LogError", SmartBind<Logger, void, const std::string&>(*this, &Logger::LogError));
+		Lua::Instance()->RegisterMethod("Logger", "LogWarning", SmartBind<Logger, void, const std::string&>(*this, &Logger::LogWarning));
+	}
+
+	void Logger::Shutdown()
 	{
 		if (_pInstance != nullptr)
 		{
@@ -24,7 +35,7 @@ namespace Engine
 			_pInstance = nullptr;
 		}
 	}
-
+	
 	Logger* Logger::Instance()
 	{
 		if (_pInstance == nullptr)
@@ -50,10 +61,10 @@ namespace Engine
 
 	void Logger::Log(const std::string& message)
 	{
-		std::lock_guard<std::mutex> lock(_mutex);
+		//std::lock_guard<std::mutex> lock(_mutex);
 
 #ifdef _DEBUG
-		Console::ConsoleColour currentColour = Console::GetTextColour();
+		Console::ConsoleColour currentColour = Console::Instance()->GetTextColour();
 #endif
 
 		std::string outString = message;
@@ -61,7 +72,7 @@ namespace Engine
 		{
 			outString = "[ERROR] " + outString;
 #ifdef _DEBUG
-			Console::SetColour(Console::ConsoleColour::Red);
+			Console::Instance()->SetColour(Console::ConsoleColour::Red);
 #endif
 		}
 		else if (_logLevel == Warning)
@@ -69,7 +80,7 @@ namespace Engine
 			outString = "[WARNING] " + outString;
 
 #ifdef _DEBUG
-			Console::SetColour(Console::ConsoleColour::Yellow);
+			Console::Instance()->SetColour(Console::ConsoleColour::Yellow);
 #endif
 		}
 
@@ -79,7 +90,7 @@ namespace Engine
 		std::string output = outString + "\n";
 		std::wstring outputW = std::wstring(output.begin(), output.end());
 		OutputDebugString(outputW.c_str());
-		Console::SetColour(currentColour);
+		Console::Instance()->SetColour(currentColour);
 #endif
 		_logLevel = Info;
 	}

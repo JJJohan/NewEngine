@@ -5,6 +5,7 @@
 #include "../Core/Core.h"
 #include "Logger.h"
 #include "../Data/Vector2.h"
+#include "../Core/Lua.h"
 
 namespace Engine
 {
@@ -12,6 +13,38 @@ namespace Engine
 	static const WORD MAX_CONSOLE_LINES = 500;
 	short Console::_backgroundColour = 0;
 	short Console::_textColour = 15;
+
+	Console* Console::_pInstance = nullptr;
+
+	Console::Console()
+	{
+		Core::Instance()->Register(this);
+		Core::Instance()->OnShutdown += std::bind(&Console::Shutdown);
+	}
+
+	void Console::Register()
+	{
+		Lua::Instance()->RegisterMethod("Console", "SetTitle", SmartBind(*this, &Console::SetTitle));
+	}
+
+	void Console::Shutdown()
+	{
+		if (_pInstance != nullptr)
+		{
+			delete _pInstance;
+			_pInstance = nullptr;
+		}
+	}
+
+	Console* Console::Instance()
+	{
+		if (_pInstance == nullptr)
+		{
+			_pInstance = new Console();
+		}
+
+		return _pInstance;
+	}
 
 	void Console::SetColour(ConsoleColour textColour, ConsoleColour backgroundColour)
 	{
@@ -68,9 +101,9 @@ namespace Engine
 		SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coordinates);
 	}
 
-	void Console::SetTitle(String title)
+	void Console::SetTitle(const std::string& title)
 	{
-		std::wstring wstr = title;
+		std::wstring wstr = std::wstring(title.begin(), title.end());
 		SetConsoleTitle(wstr.c_str());
 	}
 
@@ -82,7 +115,6 @@ namespace Engine
 	bool Console::HandlerRoutine(DWORD ctrlType)
 	{
 		Core::Instance()->Shutdown();
-		Sleep(5000);
 		return true;
 	}
 

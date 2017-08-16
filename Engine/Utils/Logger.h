@@ -13,12 +13,13 @@
 #define LOGFAILEDCOMRETURN(x,y) if(FAILED(x)) { Engine::Logging::LogError(Engine::Logging::GetWin32ErrorString()); return y; }
 
 #include "../Data/String.h"
+#include "../Core/IRegisteredClass.h"
 #include <comdef.h>
 #include <mutex>
 
 namespace Engine
 {
-	class Logger
+	class Logger : IRegisteredClass
 	{
 	public:
 		ENGINE_API void Log(const std::string& message);
@@ -29,6 +30,7 @@ namespace Engine
 		static String GetCOMError(const _com_error& error, const String& caller);
 		ENGINE_API void EnableFileLogging(bool enabled);
 		ENGINE_API void SetLogPath(const std::string& filePath);
+		void Register() override;
 
 		template <typename... Args>
 		void Log(const String& string, Args ... args)
@@ -55,7 +57,7 @@ namespace Engine
 
 	private:
 		Logger();
-		~Logger();
+		static void Shutdown();
 
 		static Logger* _pInstance;
 

@@ -18,7 +18,7 @@ namespace Engine
 
 	private:
 		Time();
-		~Time();
+		static void Shutdown();
 		void ResetCPUCounter();
 		void SetGPUDelta(float delta);
 

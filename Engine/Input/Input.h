@@ -43,7 +43,8 @@ namespace Engine
 
 	private:
 		Input();
-		~Input();
+		
+		static void Shutdown();
 
 		bool KeyEventExists(std::string eventName);
 		bool MouseEventExists(std::string eventName);
@@ -85,7 +86,7 @@ namespace Engine
 		static Input* _pInstance;
 
 		std::map<int, std::vector<KeyEvent>> _keyEvents;
-		std::map<int, bool> _activeKeys;
+		std::map<unsigned short, bool> _activeKeys;
 		std::map<int, std::vector<MouseEvent>> _mouseEvents;
 		std::map<int, bool> _activeMouseButtons;
 		std::vector<MMoveEvent> _mouseMoveEvents;

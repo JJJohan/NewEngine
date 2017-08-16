@@ -14,6 +14,7 @@ namespace Engine
 	, _mousePressed(false)
 	{
 		Core::Instance()->OnUpdate += std::bind(&Input::Update, this);
+		Core::Instance()->OnShutdown += std::bind(&Input::Shutdown);
 	}
 
 	Input* Input::Instance()
@@ -26,7 +27,7 @@ namespace Engine
 		return _pInstance;
 	}
 
-	Input::~Input()
+	void Input::Shutdown()
 	{
 		if (_pInstance != nullptr)
 		{
@@ -37,16 +38,16 @@ namespace Engine
 
 	void Input::KeyUpEvent(unsigned short keyCode)
 	{
-		_activeKeys[int(keyCode)] = false;
+		_activeKeys.insert_or_assign(keyCode, false);
 
 		CallKeyEvents(int(keyCode), false);
 	}
 
 	void Input::KeyDownEvent(unsigned short keyCode)
 	{
-		CallKeyEvents(int(keyCode), true);
+		_activeKeys.insert_or_assign(keyCode, true);
 
-		_activeKeys[int(keyCode)] = true;
+		CallKeyEvents(int(keyCode), true);
 	}
 
 	void Input::MouseButtonUpEvent(unsigned short mouseButton)

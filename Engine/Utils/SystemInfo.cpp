@@ -10,6 +10,7 @@
 #include <windows.h>
 #include <versionhelpers.h>
 #include "../Core/Lua.h"
+#include "../Core/Core.h"
 
 namespace Engine
 {
@@ -27,6 +28,12 @@ namespace Engine
 
 	SystemInfo::SystemInfo()
 	{
+		Core::Instance()->Register(this);
+	}
+
+	void SystemInfo::Register()
+	{
+		Lua::Instance()->RegisterMethod("Core", "PrintSystemInfo", SmartBind(*this, &SystemInfo::PrintSystemInfo));
 	}
 
 	SystemInfo::~SystemInfo()
@@ -51,10 +58,10 @@ namespace Engine
 		}*/
 
 #ifdef _DEBUG
-		Console::ConsoleColour textColour = Console::GetTextColour();
-		Console::SetColour(Console::ConsoleColour::Cyan);
-		Vector2 cursorPos = Console::GetCursorPos();
-		Console::SetCursorPos(0, int(cursorPos.Y));
+		Console::ConsoleColour textColour = Console::Instance()->GetTextColour();
+		Console::Instance()->SetColour(Console::ConsoleColour::Cyan);
+		Vector2 cursorPos = Console::Instance()->GetCursorPos();
+		Console::Instance()->SetCursorPos(0, int(cursorPos.Y));
 #endif
 
 		Logger::Instance()->Log("----------------------");
@@ -78,7 +85,7 @@ namespace Engine
 		Logger::Instance()->Log("----------------------");
 
 #ifdef _DEBUG
-		Console::SetColour(textColour);
+		Console::Instance()->SetColour(textColour);
 #endif
 
 		// Make sure logging is re-enabled if it was hidden.

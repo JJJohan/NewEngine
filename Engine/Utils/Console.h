@@ -4,6 +4,8 @@
 #define WIN32_LEAN_AND_MEAN
 #define WIN32_EXTRA_LEAN
 #include <windows.h>
+#include <string>
+#include "../Core/IRegisteredClass.h"
 
 namespace Engine
 {
@@ -11,7 +13,7 @@ namespace Engine
 	class Vector2;
 	class Colour;
 
-	class Console
+	class Console : IRegisteredClass
 	{
 	public:
 		enum ConsoleColour
@@ -41,15 +43,24 @@ namespace Engine
 			White = 15
 		};
 
-		static ENGINE_API void InitConsole();
-		static ENGINE_API void SetColour(ConsoleColour textColour, ConsoleColour backgroundColour = Current);
-		static ENGINE_API ConsoleColour GetTextColour();
-		static ENGINE_API ConsoleColour GetBackgroundColour();
-		static ENGINE_API Vector2 GetCursorPos();
-		static ENGINE_API void SetCursorPos(int x, int y);
-		static ENGINE_API void SetTitle(String title);
+		ENGINE_API void InitConsole();
+		ENGINE_API void SetColour(ConsoleColour textColour, ConsoleColour backgroundColour = Current);
+		ENGINE_API ConsoleColour GetTextColour();
+		ENGINE_API ConsoleColour GetBackgroundColour();
+		ENGINE_API Vector2 GetCursorPos();
+		ENGINE_API void SetCursorPos(int x, int y);
+		ENGINE_API void SetTitle(const std::string& title);
+
+		void Register() override;
+
+		static ENGINE_API Console* Instance();
 
 	private:
+		Console();
+		static void Shutdown();
+
+		static Console* _pInstance;
+
 		static bool HandlerRoutine(DWORD ctrlType);
 		static short _textColour;
 		static short _backgroundColour;

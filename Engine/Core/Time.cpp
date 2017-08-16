@@ -28,9 +28,10 @@ namespace Engine
 		_cpuCounter = double(li.QuadPart);
 
 		Core::Instance()->OnUpdate += std::bind(&Time::Update, this);
+		Core::Instance()->OnShutdown += std::bind(&Time::Shutdown);
 	}
 
-	Time::~Time()
+	void Time::Shutdown()
 	{
 		if (_pInstance != nullptr)
 		{
@@ -82,7 +83,7 @@ namespace Engine
 		QueryPerformanceFrequency(&freq);
 		QueryPerformanceCounter(&begin);
 		QueryPerformanceCounter(&end);
-		__int64 waitTime = __int64(freq.QuadPart * seconds);
+		const __int64 waitTime = __int64(freq.QuadPart * seconds);
 		while (end.QuadPart - begin.QuadPart < waitTime)
 		{
 			std::this_thread::sleep_for(std::chrono::microseconds(1));

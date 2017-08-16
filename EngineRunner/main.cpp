@@ -1,61 +1,60 @@
 #include <cstdlib>
 #include "../Engine/Utils/Logger.h"
 #include "../Engine/Core/Core.h"
-#include "../Engine/Core/Time.h"
 #include "../Engine/Utils/Console.h"
-#include "Utils/SystemInfo.h"
+#include "../Engine/Core/Lua.h"
+#include "../Engine/Utils/SystemInfo.h"
+#include "../Engine/Rendering/SceneManager.h"
+#include "Rendering/GameObject.h"
+#include "Rendering/ICamera.h"
+#include "Rendering/IMesh.h"
+#include "Data/Colour.h"
 
 using namespace Engine;
 
-class Game
-{
-public:
-	Game();
+Core core;
+Scene* scene;
+ICamera* camera;
 
-	void Start();
-	void Update() const;
-	void Draw() const;
-	void Destroy() const;
-};
-
-Game::Game()
+void Start()
 {
+	Logger::Instance()->Log("Starting engine...\n");
+
+	//Lua::Instance()->Load(Core::Instance()->GetApplicationDirectory() + "game.lua");
+
+	core.Initialise(1024, 768, false, "D3D11");
+	core.SetMaxFPS(60);
+	SystemInfo::Instance()->PrintSystemInfo();
+
+	scene = SceneManager::Instance()->CreateScene();
+
+	GameObject* go = new GameObject("Main Camera");
+	camera = go->AddComponent<ICamera>();
 }
 
-void Game::Start()
+void Update()
 {
+
 }
 
-void Game::Update() const
+void Render()
 {
+	camera->Render();
 }
 
-void Game::Draw() const
+void Shutdown()
 {
-}
-
-void Game::Destroy() const
-{
+	
 }
 
 int WINAPI WinMain(HINSTANCE hInstance,
                    HINSTANCE hPrevInstance,
                    LPSTR lpCmdLine,
                    int nCmdShow)
-{
-#ifdef _DEBUG
-	Console::InitConsole();
-#endif
-
-	Logger::Instance()->Log("Starting engine...\n");
-	
-	float timer = 0.0f;
-
-	Core core;
-	//Core::Initialise(1024, 768, true, engineLink);
-	//Core::SetMaxFPS(300);
-
-	//SystemInfo::PrintSystemInfo();
+{		
+	Start();
+	core.OnUpdate += Update;
+	core.OnRender += Render;
 
 	while (core.Running())
 	{
@@ -64,19 +63,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
 			// Update returned false, exit.
 			break;
 		}
-
-		float dt = Time::Instance()->DeltaTime();
-		timer += dt;
-		if (timer > 0.1f)
-		{
-			String title = String::Format("Engine - CPU: {0} FPS", int(1 / dt));
-			Console::SetTitle(title);
-			timer -= 0.1f;
-		}
 	}
 
-	Logger::Instance()->Log("\n\nDestroying engine...");
-
+	Shutdown();
 	core.Shutdown();
 
 	Logger::Instance()->Log("Engine destroyed");
